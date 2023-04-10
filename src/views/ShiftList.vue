@@ -66,7 +66,7 @@
               Delete
             </v-btn>
             <v-btn
-              v-if="item.status === 'New'"
+              v-if="item.status !== 'Approved'"
               small
               color="green"
               @click="editStatusShift(item.id, item.status)"
