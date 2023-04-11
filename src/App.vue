@@ -3,6 +3,7 @@
     <v-app-bar app dark>
       <a href class="navbar-brand" @click.prevent="home">Shift Management</a>
       <v-btn v-if="isLeader" to="/employees" text> Employees </v-btn>
+      <v-btn v-if="isLeader" to="/orders" text> Orders </v-btn>
       <v-btn v-if="isLeader" to="/shifts" text> Shifts </v-btn>
       <v-btn v-if="isLeader" to="/add" text> Add Shift </v-btn>
       <v-btn v-if="isEmployee" to="/shift" text> Shift </v-btn>

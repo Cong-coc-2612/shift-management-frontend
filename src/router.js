@@ -76,6 +76,11 @@ export const router = new Router({
       path: "/shift",
       name: "shift",
       component: () => import("./views/ShiftForEmployee.vue")
+    },
+    {
+      path: "/orders",
+      name: "orders",
+      component: () => import("./views/OrderList.vue")
     }   
   ]
 });

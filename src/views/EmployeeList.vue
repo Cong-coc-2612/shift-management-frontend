@@ -38,6 +38,7 @@
     <v-col cols="12" sm="12">
       <v-card class="mx-auto" tile>
         <h4>List Employee</h4>
+        <p>Total Item: {{totalItems}}</p>
         <v-data-table
           :headers="headers"
           :items="employees"
@@ -107,6 +108,7 @@ export default {
 
       page: 1,
       totalPages: 0,
+      totalItems: 0,
       pageSize: 10,
 
       pageSizes: [5, 10, 15],
@@ -141,8 +143,7 @@ export default {
       UserDataService.getAll(params)
         .then((response) => {
           this.employees = response.data;
-          // this.shifts = shifts.map(this.getDisplayShift);
-
+          this.totalItems = this.employees.length;
           console.log(response.data);
         })
         .catch((e) => {
@@ -173,6 +174,7 @@ export default {
     TeamDataService.getAll()
       .then((response) => {
         this.itemGroup = response.data;
+        this.totalItems = this.itemGroup.length;
         console.log(response.data);
       })
       .catch((e) => {

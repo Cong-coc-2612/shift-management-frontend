@@ -1,9 +1,9 @@
 import http from "../http-common";
 
-class UserDataService {
+class TeamDataService {
   getAll() {
     return http.get("/teams");
   }
 }
 
-export default new UserDataService();
+export default new TeamDataService();

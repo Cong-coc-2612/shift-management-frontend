@@ -11,15 +11,59 @@
         return-object
         single-line
         @change="changeGroup"
-        hide-details
       ></v-select>
     </v-col>
     <v-col cols="5" sm="2">
       <v-text-field
         v-model="fullName"
         label="Search by employee name"
-        hide-details
       ></v-text-field>
+    </v-col>
+    <v-col cols="5" sm="2">
+      <v-menu
+        v-model="menu"
+        :close-on-content-click="true"
+        :nudge-right="40"
+        transition="scale-transition"
+        offset-y
+        class="ma-0 pa-0"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            v-model="startDate"
+            label="Start Date"
+            readonly
+            v-bind="attrs"
+            v-on="on"
+            clearable
+          ></v-text-field>
+        </template>
+        <v-date-picker
+          v-model="startDate"
+          @input="menu = false"
+        ></v-date-picker>
+      </v-menu>
+    </v-col>
+    <v-col cols="5" sm="2">
+      <v-menu
+        v-model="menu2"
+        :close-on-content-click="true"
+        :nudge-right="40"
+        transition="scale-transition"
+        offset-y
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-text-field
+            v-model="endDate"
+            label="End Date"
+            readonly
+            v-bind="attrs"
+            v-on="on"
+            clearable
+          ></v-text-field>
+        </template>
+        <v-date-picker v-model="endDate" @input="menu2 = false"></v-date-picker>
+      </v-menu>
     </v-col>
     <v-col cols="5" sm="4">
       <v-btn
@@ -39,8 +83,9 @@
     </v-col>
 
     <v-col cols="12" sm="12">
-      <v-card class="mx-auto" tile="true">
+      <v-card class="mx-auto" tile>
         <h4>List Shift</h4>
+        <p>Total Item: {{ totalItems }}</p>
         <v-data-table
           :headers="headers"
           :items="shifts"
@@ -112,6 +157,11 @@ export default {
   name: 'shifts-list',
   data() {
     return {
+      date: new Date().toISOString().substr(0, 10),
+      menu: false,
+      menu2: false,
+      startDate: null,
+      endDate: null,
       team: { id: 1, teamName: 'Tổ Sản Xuất' },
       itemGroup: [],
       shifts: [],
@@ -119,13 +169,13 @@ export default {
       headers: [
         {
           text: 'Employee Code',
-          align: 'center',
+          align: 'left',
           sortable: true,
           value: 'employeeCode',
         },
         {
           text: 'Employee Name',
-          align: 'center',
+          align: 'left',
           value: 'employeeName',
           sortable: true,
         },
@@ -138,14 +188,14 @@ export default {
         },
         {
           text: 'Description',
-          align: 'center',
+          align: 'left',
           value: 'description',
           sortable: false,
         },
         { text: 'Status', align: 'center', value: 'status', sortable: true },
         {
           text: 'Operation',
-          align: 'center',
+          align: 'left',
           value: 'operation',
           sortable: true,
         },
@@ -153,13 +203,22 @@ export default {
 
       page: 1,
       totalPages: 0,
+      totalItems: 0,
       pageSize: 10,
 
       pageSizes: [5, 10, 15],
     };
   },
   methods: {
-    getRequestParams(fullName, teamId, userId, page, pageSize) {
+    getRequestParams(
+      fullName,
+      teamId,
+      userId,
+      startDate,
+      endDate,
+      page,
+      pageSize
+    ) {
       let params = {};
 
       if (fullName) {
@@ -178,6 +237,14 @@ export default {
         params['teamId'] = teamId;
       }
 
+      if (startDate) {
+        params['startDate'] = startDate;
+      }
+
+      if (endDate) {
+        params['endDate'] = endDate;
+      }
+
       return params;
     },
 
@@ -186,16 +253,18 @@ export default {
         this.fullName,
         this.team.id,
         null,
+        this.startDate,
+        this.endDate,
         this.page,
         this.pageSize
       );
 
       ShiftDataService.getAll(params)
         .then((response) => {
-          const { shifts, totalPages } = response.data;
+          const { shifts, totalItems, totalPages } = response.data;
           this.shifts = shifts.map(this.getDisplayShift);
           this.totalPages = totalPages;
-
+          this.totalItems = totalItems;
           console.log(response.data);
         })
         .catch((e) => {
