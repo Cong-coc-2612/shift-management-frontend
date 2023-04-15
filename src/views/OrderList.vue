@@ -5,8 +5,12 @@
         v-model="search"
         label="Search"
         single-line
-        hide-details
       ></v-text-field>
+    </v-col>
+    <v-col cols="5" sm="2">
+      <v-btn v-if="isDirector()" small color="green" @click="moveToAddScreen">
+        Add new Shift
+      </v-btn>
     </v-col>
     <v-col cols="12" sm="12">
       <v-card class="mx-auto" tile>
@@ -19,6 +23,26 @@
           :search="search"
           class="custom_table_class"
         >
+          <template v-slot:[`item.operation`]="{ item }">
+            <v-btn
+              v-if="isDirector()"
+              small
+              color="yellow"
+              class="mr-2"
+              @click="editOrder(item.id)"
+            >
+              Edit
+            </v-btn>
+            <v-btn
+              v-if="isDirector()"
+              small
+              class="mr-2"
+              color="error"
+              @click="deleteOrder(item.id)"
+            >
+              Delete
+            </v-btn>
+          </template>
         </v-data-table>
         <v-card-actions> </v-card-actions>
       </v-card>
@@ -33,10 +57,8 @@ export default {
   data() {
     return {
       search: '',
-      team: { id: 1, teamName: 'Tổ Sản Xuất' },
       itemGroup: [],
       orders: [],
-      fullName: '',
       headers: [
         {
           text: 'Order Code',
@@ -74,6 +96,12 @@ export default {
           value: 'createdDate',
           sortable: true,
         },
+        {
+          text: 'Operation',
+          align: 'left',
+          value: 'operation',
+          sortable: true,
+        },
       ],
 
       page: 1,
@@ -83,6 +111,11 @@ export default {
 
       pageSizes: [5, 10, 15],
     };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
   },
   methods: {
     getRequestParams(fullName, teamId, userId, page, pageSize) {
@@ -123,6 +156,29 @@ export default {
 
     refreshList() {
       this.retrieveOrders();
+    },
+    editOrder(id) {
+      console.log(id);
+      this.$router.push({ name: 'order-details', params: { id: id } });
+    },
+    deleteOrder(id) {
+      OrderDataService.delete(id)
+        .then(() => {
+          this.refreshList();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    isDirector() {
+      if (this.currentUser && this.currentUser.roles) {
+        return this.currentUser.roles.includes('ROLE_DIRECTOR');
+      }
+
+      return false;
+    },
+    moveToAddScreen() {
+      this.$router.push({ name: 'add-order' });
     },
   },
   mounted() {

@@ -73,11 +73,18 @@
         >
           <template v-slot:[`item.operation`]="{ item }">
             <v-btn
+              small
+              color="yellow"
+              class="mr-2"
+              @click="editShift(item.id)"
+            >
+              Edit
+            </v-btn>
+            <v-btn
               v-if="item.status === 'New'"
               small
               color="green"
-              class="mr-2"
-              @click="editShift(item.id, item.status)"
+              @click="editStatusShift(item.id, item.status)"
             >
               Finish
             </v-btn>
@@ -261,7 +268,11 @@ export default {
         });
     },
 
-    editShift(id, status) {
+    editShift(id) {
+      console.log(id);
+      this.$router.push({ name: 'shift-details', params: { id: id } });
+    },
+    editStatusShift(id, status) {
       status = 'Finished';
       ShiftDataService.updateStatus(id, status)
         .then((response) => {

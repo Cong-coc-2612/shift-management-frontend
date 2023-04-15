@@ -81,7 +81,17 @@ export const router = new Router({
       path: "/orders",
       name: "orders",
       component: () => import("./views/OrderList.vue")
-    }   
+    },   
+    {
+      path: "/add-order",
+      name: "add-order",
+      component: () => import("./views/AddOrder.vue")
+    },
+    {
+      path: "/orders/:id",
+      name: "order-details",
+      component: () => import("./views/Order.vue")
+    },
   ]
 });
 

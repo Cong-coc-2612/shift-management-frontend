@@ -29,6 +29,7 @@
             readonly
             v-bind="attrs"
             v-on="on"
+            :disabled="isLeader() == false"
           ></v-text-field>
         </template>
         <v-date-picker
@@ -41,12 +42,22 @@
         :rules="[(v) => !!v || 'Number of shift is required']"
         :items="itemNumberOfShift"
         label="Number of shift"
+        :disabled="isLeader() == false"
       >
       </v-select>
-      <v-radio-group v-model="shift.status" label="Status" inline>
+      <v-radio-group
+        v-model="shift.status"
+        label="Status"
+        inline
+        :disabled="isLeader() == false && shift.status == 'Approved'"
+      >
         <v-radio label="New" value="New"></v-radio>
         <v-radio label="Finished" value="Finished"></v-radio>
-        <v-radio label="Approved" value="Approved"></v-radio>
+        <v-radio
+          label="Approved"
+          value="Approved"
+          :disabled="isLeader() == false"
+        ></v-radio>
       </v-radio-group>
       <v-textarea
         v-model="shift.description"
@@ -55,10 +66,22 @@
         auto-grow
       ></v-textarea>
 
-      <v-btn color="success" class="mr-2" small @click="updateShift" :disabled="!validForm">
+      <v-btn
+        color="success"
+        class="mr-2"
+        small
+        @click="updateShift"
+        :disabled="!validForm"
+      >
         Update
       </v-btn>
-      <v-btn color="error" small class="mr-2" @click="deleteShift">
+      <v-btn
+        color="error"
+        small
+        class="mr-2"
+        @click="deleteShift"
+        :disabled="isLeader() == false"
+      >
         Delete
       </v-btn>
       <v-btn small @click="cancel">Back</v-btn>
@@ -96,6 +119,11 @@ export default {
       statusShift: 'New',
     };
   },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+  },
   methods: {
     getShift(id) {
       ShiftDataService.get(id)
@@ -107,24 +135,6 @@ export default {
           console.log(e);
         });
     },
-
-    // updatePublished(status) {
-    //   var data = {
-    //     id: this.shift.id,
-    //     title: this.shift.title,
-    //     description: this.shift.description,
-    //     published: status,
-    //   };
-
-    //   ShiftDataService.update(this.currentShift.id, data)
-    //     .then((response) => {
-    //       this.currentShift.published = status;
-    //       console.log(response.data);
-    //     })
-    //     .catch((e) => {
-    //       console.log(e);
-    //     });
-    // },
 
     updateShift() {
       console.log(this.shift);
@@ -152,8 +162,28 @@ export default {
         });
     },
     cancel() {
-      this.$router.push({ name: 'shifts' });
+      if (this.isLeader()) {
+        this.$router.push({ name: 'shifts' });
+      } else if (this.isEmployee()) {
+        this.$router.push({ name: 'shift' });
+      } else {
+        this.$router.push({ name: 'home' });
+      }
     },
+    isLeader() {
+      if (this.currentUser && this.currentUser.roles) {
+        return this.currentUser.roles.includes('ROLE_LEADER');
+      }
+
+      return false;
+    },
+    isEmployee() {
+      if (this.currentUser && this.currentUser.roles) {
+        return this.currentUser.roles.includes('ROLE_EMPLOYEE');
+      }
+
+      return false;
+    }
   },
   mounted() {
     this.message = '';
