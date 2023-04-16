@@ -96,7 +96,7 @@
           <v-btn small class="mt-3" color="success" @click="newOrder"
             >Add New Order</v-btn
           >
-          <v-btn small class="mt-3" @click="cancel">Cancel</v-btn>
+          <v-btn small class="mt-3" @click="cancel">Back</v-btn>
         </v-card-actions>
       </v-card>
     </div>

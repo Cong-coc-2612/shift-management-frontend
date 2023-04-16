@@ -9,7 +9,7 @@
     </v-col>
     <v-col cols="5" sm="2">
       <v-btn v-if="isDirector()" small color="green" @click="moveToAddScreen">
-        Add new Shift
+        Add new Order
       </v-btn>
     </v-col>
     <v-col cols="12" sm="12">
